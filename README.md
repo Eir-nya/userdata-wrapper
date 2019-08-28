@@ -66,7 +66,7 @@ Now imagine putting this in a new .lua file and loading it as a library at the b
 
 This library has many uses beyond this, too.
 
-Read on for tutorials and documentatio on the rest of the library!
+Read on for tutorials and documentation on the rest of the library!
 
 # Override Tables
 
