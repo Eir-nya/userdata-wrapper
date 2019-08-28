@@ -70,13 +70,13 @@ Read on for tutorials and documentation on the rest of the library!
 
 # Override Tables
 
-So, here is a tutorial on "override tables". These are special tables, and they will let you
-do whatever it is you needed this library to do in the first place.
+So, here is a tutorial on "override tables". These are special tables that provide a list of properties (functions and variables)
+that you want to write custom code for.
 
-They basically let you "override" (hence the name) userdata properties on a wrapped userdata object.
+They basically let you "override" (hence the name) userdata properties on a wrapped userdata object. In addition, any properties
+you add that are not properties of the original userdata object will be added as *custom* properties.
 
-You can override all of: normal variables (like sprite.spritename), read-only variables (like Player.maxhp),
-and even functions (like Player.Hurt).
+You can override all of: normal variables (like `sprite.spritename`), read-only variables (like `Player.maxhp`), and even functions (like `Player.Hurt`).
 
 This uses a system called "getters and setters".
 
@@ -117,7 +117,7 @@ get(_REAL_OBJECT, FAKE_OBJECT)
 You get access to both the real object (like the actual userdata projectile, for instance), and the fake object (that is, the
 metatable that "replaces" the actual userdata object).
 
-
+&nbsp;
 
 Let's make use of these two arguments together! How about making `sprite.Set` automatically start an animation when you enter a certain phrase?
 
@@ -149,13 +149,27 @@ sprite = wrapper.WrapSprite(sprite, {
 ```
 
 Yeah, pretty useful, isn't it? Now, by just entering
-    `sprite.Set("attacking")`
+
+```lua
+sprite.Set("attacking")
+```
+
 the code automatically calls
-    `sprite.SetAnimation({"1", "2", "3", "4", "5", "6"}, 0.4, "Character/Attacking")`
+
+```lua
+sprite.SetAnimation({"1", "2", "3", "4", "5", "6"}, 0.4, "Character/Attacking")`
+```
+
 AND
-    `sprite.loopMode = "ONESHOT"` !
 
+```lua
+sprite.loopMode = "ONESHOT"
+```
+!
 
+*(As a side note, the `...` you see above is a **[VarArg](http://lua-users.org/wiki/VarargTheSecondClassCitizen)**. You don't need to know how to do this to use this library.)*
+
+&nbsp;
 
 Next example: Overriding a variable that can be both get and set.
 
@@ -194,10 +208,7 @@ their hp value returns +infinity.
 So, yes, as you can see, you can use this on all userdata values, and you can use both getters and setters.
 Now, on to the next step! Applying your changes to every userdata of a type!
 
-
-
-!! Note: If you only include a get function, then the variable will become read-only. !!
-
+&nbsp;
 
 
 So, I have a custom replacement for `bullet.Move` that I want to apply to EVERY bullet. How do I do it?
@@ -231,7 +242,6 @@ end
 But this is tedious, it takes up extra room, and there's got to be a better way, right?
 
 
-
 Well, this library has the ability to wrap the default userdata-creating functions for you!
 
 Here's an easier way to do what I did above:
@@ -249,14 +259,12 @@ wrapper.WrapCreateProjectile()
 wrapper.WrapCreateProjectileAbs()
 ```
 
-There! Not only was it cleaner and easier to do, but it also applied the changes to CreateProjectileAbs!
+There! Not only was it cleaner and easier to do, but it also applied the changes to `CreateProjectileAbs`!
 
 So: This is something you can do for ALL "multi-instance" userdata objects. The prime examples of what I'm talking about
 are projectiles and sprites. Basically, anything that you can create a potentially infinite amount of.
 
-
-
-
+&nbsp;
 
 Now, for the full list of variables and functions for this library:
 

@@ -218,13 +218,14 @@ With this library, a huge number of things are possible! Just think of what you 
 ---- [OVER] OVERRIDE TABLES ----
 --============================--
 
-So, here is a tutorial on "override tables". These are special tables, and they will let you
-do whatever it is you needed this library to do in the first place.
+So, here is a tutorial on "override tables". These are special tables that provide a list of properties (functions and variables)
+that you want to write custom code for.
 
-They basically let you "override" (hence the name) userdata properties on a wrapped userdata object.
+They basically let you "override" (hence the name) userdata properties on a wrapped userdata object. In addition, any properties
+you add that are not properties of the original userdata object will be added as custom properties.
 
-You can override all of: normal variables (like sprite.spritename), read-only variables (like Player.maxhp),
-and even functions (like Player.Hurt).
+You can override all of: normal variables (like `sprite.spritename`), read-only variables (like `Player.maxhp`),
+and even functions (like `Player.Hurt`).
 
 This uses a system called "getters and setters".
 
@@ -303,6 +304,8 @@ the code automatically calls
 AND
     `sprite.loopMode = "ONESHOT"` !
 
+(As a side note, the `...` you see above is a VarArg (http://lua-users.org/wiki/VarargTheSecondClassCitizen). You don't need to know how to do this to use this library.)
+
 
 
 Next example: Overriding a variable that can be both get and set.
@@ -341,10 +344,6 @@ their hp value returns +infinity.
 
 So, yes, as you can see, you can use this on all userdata values, and you can use both getters and setters.
 Now, on to the next step! Applying your changes to every userdata of a type!
-
-
-
-!! Note: If you only include a get function, then the variable will become read-only. !!
 
 
 
@@ -397,7 +396,7 @@ wrapper.WrapCreateProjectile()
 wrapper.WrapCreateProjectileAbs()
 ```
 
-There! Not only was it cleaner and easier to do, but it also applied the changes to CreateProjectileAbs!
+There! Not only was it cleaner and easier to do, but it also applied the changes to `CreateProjectileAbs`!
 
 So: This is something you can do for ALL "multi-instance" userdata objects. The prime examples of what I'm talking about
 are projectiles and sprites. Basically, anything that you can create a potentially infinite amount of.
