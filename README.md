@@ -37,7 +37,7 @@ This takes all of the work out of the process. You don't need to know metatables
 The above example is now as simple as
 
 ```lua
-wrapper = require "Libraries/userdata_wrapper"
+wrapper = require "Libraries/userdataWrapper"
 wrapper.WrapPlayer({
         Hurt = {
             set = function(_pla, pla, hurtAmount, invulnFrames)

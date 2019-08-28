@@ -132,7 +132,7 @@ Let's continue our example: How would we disable Player.Hurt using this library?
 It's literally just four lines:
 
 ```
-wrapper = require "Libraries/userdata_wrapper"
+wrapper = require "Libraries/userdataWrapper"
 wrapper.WrapPlayer({
         Hurt = {set = function() end}
     })
