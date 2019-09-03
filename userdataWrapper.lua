@@ -1487,11 +1487,14 @@ function self.WrapText(_txt, customTable)
         
         setmetatable(returnTab, {
                 __index = function(_, index)
-                    -- allow for `txtipt["variable"]`
-                    if txt[index] and txt[index].get then
-                        return txt[index].get(_txt, returnTab)
-                    elseif txt[index].set then -- if a property has set but not get, it must be a function
-                        return txt[index] -- in that case, this line will access the "set" value retrieved above
+                    if txt[index] then
+                        if txt[index].get then
+                            return txt[index].get(_txt, returnTab)
+                        elseif txt[index].set then -- if a property has set but not get, it must be a function
+                            return txt[index] -- in that case, this line will access the "set" value retrieved above
+                        end
+                    else
+                        error("cannot access field " .. tostring(index) .. " of wrapped userdata <" .. tostring(_txt) .. ">", 2)
                     end
                     
                     if self.disguise then
@@ -1696,6 +1699,8 @@ local wrapPlayer = function(_pla, customTable)
                         elseif pla[index].set then -- if a property has set but not get, it must be a function
                             return pla[index] -- in that case, this line will access the "set" value retrieved above
                         end
+                    else
+                        error("cannot access field " .. tostring(index) .. " of wrapped userdata <" .. tostring(_pla) .. ">", 2)
                     end
                     
                     if self.disguise then
@@ -2032,10 +2037,14 @@ local wrapNewAudio = function(_new, customTable)
         
         setmetatable(returnTab, {
                 __index = function(_, index)
-                    if new[index].get then
-                        return new[index].get(_new, returnTab)
-                    elseif new[index].set then -- if a property has set but not get, it must be a function
-                        return new[index] -- in that case, this line will access the "set" value retrieved above
+                    if new[index] then
+                        if new[index].get then
+                            return new[index].get(_new, returnTab)
+                        elseif new[index].set then -- if a property has set but not get, it must be a function
+                            return new[index] -- in that case, this line will access the "set" value retrieved above
+                        end
+                    else
+                        error("cannot access field " .. tostring(index) .. " of wrapped userdata <" .. tostring(_new) .. ">", 2)
                     end
                     
                     if self.disguise then
@@ -2135,10 +2144,6 @@ local wrapInput = function(_inp, customTable)
             end
         end
         
-        for _, name in pairs(getAndSet) do
-            inp[name] = {get = function() return _inp[name] end, set = function(val) _inp[name] = val end}
-        end
-        
         -- Can be Get and Set:
         -- (none)
         
@@ -2195,10 +2200,14 @@ local wrapInput = function(_inp, customTable)
         
         setmetatable(returnTab, {
                 __index = function(_, index)
-                    if inp[index].get then
-                        return inp[index].get(_inp, returnTab)
-                    elseif inp[index].set then -- if a property has set but not get, it must be a function
-                        return inp[index] -- in that case, this line will access the "set" value retrieved above
+                    if inp[index] then
+                        if inp[index].get then
+                            return inp[index].get(_inp, returnTab)
+                        elseif inp[index].set then -- if a property has set but not get, it must be a function
+                            return inp[index] -- in that case, this line will access the "set" value retrieved above
+                        end
+                    else
+                        error("cannot access field " .. tostring(index) .. " of wrapped userdata <" .. tostring(_inp) .. ">", 2)
                     end
                     
                     if self.disguise then
@@ -2352,10 +2361,14 @@ local wrapTime = function(_tim, customTable)
         
         setmetatable(returnTab, {
                 __index = function(_, index)
-                    if tim[index].get then
-                        return tim[index].get(_tim, returnTab)
-                    elseif tim[index].set then -- if a property has set but not get, it must be a function
-                        return tim[index] -- in that case, this line will access the "set" value retrieved above
+                    if tim[index] then
+                        if tim[index].get then
+                            return tim[index].get(_tim, returnTab)
+                        elseif tim[index].set then -- if a property has set but not get, it must be a function
+                            return tim[index] -- in that case, this line will access the "set" value retrieved above
+                        end
+                    else
+                        error("cannot access field " .. tostring(index) .. " of wrapped userdata <" .. tostring(_tim) .. ">", 2)
                     end
                     
                     if self.disguise then
@@ -2510,10 +2523,14 @@ local wrapMisc = function(_mis, customTable)
         
         setmetatable(returnTab, {
                 __index = function(_, index)
-                    if mis[index].get then
-                        return mis[index].get(_mis, returnTab)
-                    elseif mis[index].set then -- if a property has set but not get, it must be a function
-                        return mis[index] -- in that case, this line will access the "set" value retrieved above
+                    if mis[index] then
+                        if mis[index].get then
+                            return mis[index].get(_mis, returnTab)
+                        elseif mis[index].set then -- if a property has set but not get, it must be a function
+                            return mis[index] -- in that case, this line will access the "set" value retrieved above
+                        end
+                    else
+                        error("cannot access field " .. tostring(index) .. " of wrapped userdata <" .. tostring(_mis) .. ">", 2)
                     end
                     
                     if self.disguise then
@@ -2689,10 +2706,14 @@ local wrapArena = function(_are, customTable)
         
         setmetatable(returnTab, {
                 __index = function(_, index)
-                    if are[index].get then
-                        return are[index].get(_are, returnTab)
-                    elseif are[index].set then -- if a property has set but not get, it must be a function
-                        return are[index] -- in that case, this line will access the "set" value retrieved above
+                    if are[index] then
+                        if are[index].get then
+                            return are[index].get(_are, returnTab)
+                        elseif are[index].set then -- if a property has set but not get, it must be a function
+                            return are[index] -- in that case, this line will access the "set" value retrieved above
+                        end
+                    else
+                        error("cannot access field " .. tostring(index) .. " of wrapped userdata <" .. tostring(_are) .. ">", 2)
                     end
                     
                     if self.disguise then
@@ -2837,10 +2858,14 @@ local wrapInventory = function(_inv, customTable)
         
         setmetatable(returnTab, {
                 __index = function(_, index)
-                    if inv[index].get then
-                        return inv[index].get(_inv, returnTab)
-                    elseif inv[index].set then -- if a property has set but not get, it must be a function
-                        return inv[index] -- in that case, this line will access the "set" value retrieved above
+                    if inv[index] then
+                        if inv[index].get then
+                            return inv[index].get(_inv, returnTab)
+                        elseif inv[index].set then -- if a property has set but not get, it must be a function
+                            return inv[index] -- in that case, this line will access the "set" value retrieved above
+                        end
+                    else
+                        error("cannot access field " .. tostring(index) .. " of wrapped userdata <" .. tostring(_inv) .. ">", 2)
                     end
                     
                     if self.disguise then
