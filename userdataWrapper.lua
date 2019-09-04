@@ -846,7 +846,7 @@ function self.WrapSprite(_spr, customTable)
                 })
         end
         
-        -- special case for custom values: pass the real object as the first argument, and the fake object as the second
+        -- pass the real object as the first argument, and the fake object as the second
         for k, v in pairs(customTable) do
             if type(spr[k]) == "table" then -- allow properties and functions to be set to nil
                 setmetatable(spr[k], {
@@ -884,7 +884,7 @@ function self.WrapSprite(_spr, customTable)
                         _spr.SetVar(key, value)
                     else
                         if spr[key].set then
-                            -- for custom values only: pass the real sprite object, then the fake one, then the value
+                            -- pass the real object, then the fake one, then the value
                             if customTable[key] then
                                 spr[key].set(_spr, returnTab, value)
                             else
@@ -1061,7 +1061,7 @@ function self.WrapProjectile(_prj, customTable)
                 })
         end
         
-        -- special case for custom values: pass the real projectile object as the first argument, and the fake object as the second
+        -- pass the real object as the first argument, and the fake object as the second
         for k, v in pairs(customTable) do
             if type(prj[k]) == "table" then -- allow properties and functions to be set to nil
                 setmetatable(prj[k], {
@@ -1099,7 +1099,7 @@ function self.WrapProjectile(_prj, customTable)
                         _prj.SetVar(key, value)
                     else
                         if prj[key].set then
-                            -- for custom values only: pass the real sprite object, then the fake one, then the value
+                            -- pass the real object, then the fake one, then the value
                             if customTable[key] then
                                 return prj[key].set(_prj, returnTab, value)
                             else
@@ -1239,7 +1239,7 @@ function self.WrapScript(_scr, customTable)
                 })
         end
         
-        -- special case for custom values: pass the real script object as the first argument, and the fake object as the second
+        -- pass the real object as the first argument, and the fake object as the second
         for k, v in pairs(customTable) do
             if type(scr[k]) == "table" then -- allow properties and functions to be set to nil
                 setmetatable(scr[k], {
@@ -1277,7 +1277,7 @@ function self.WrapScript(_scr, customTable)
                         _scr.SetVar(key, value)
                     else
                         if scr[key].set then
-                            -- for custom values only: pass the real sprite object, then the fake one, then the value
+                            -- pass the real object, then the fake one, then the value
                             if customTable[key] then
                                 return scr[key].set(_scr, returnTab, value)
                             else
@@ -1472,7 +1472,7 @@ function self.WrapText(_txt, customTable)
                 })
         end
         
-        -- special case for custom values: pass the real text object as the first argument, and the fake object as the second
+        -- pass the real object as the first argument, and the fake object as the second
         for k, v in pairs(customTable) do
             if type(txt[k]) == "table" then -- allow properties and functions to be set to nil
                 setmetatable(txt[k], {
@@ -1505,7 +1505,7 @@ function self.WrapText(_txt, customTable)
                 end,
                 __newindex = function(_, key, value)
                     if txt[key].set then
-                        -- for custom values only: pass the real text object, then the fake one, then the value
+                        -- pass the real object, then the fake one, then the value
                         if customTable[key] then
                             return txt[key].set(_txt, returnTab, value)
                         else
@@ -1676,7 +1676,7 @@ local wrapPlayer = function(_pla, customTable)
                 })
         end
         
-        -- special case for custom values: pass the real Player object as the first argument, and the fake object as the second
+        -- pass the real object as the first argument, and the fake object as the second
         if customTable then
             for k, v in pairs(customTable) do
                 if type(pla[k]) == "table" then -- allow for variables and functions to be set to nil
@@ -1711,7 +1711,7 @@ local wrapPlayer = function(_pla, customTable)
                 end,
                 __newindex = function(_, key, value)
                     if pla[key].set then
-                        -- for custom values only: pass the real Player object, then the fake one, then the value
+                        -- pass the real object, then the fake one, then the value
                         if customTable[key] then
                             pla[key].set(_pla, returnTab, value)
                         else
@@ -1855,7 +1855,7 @@ local wrapAudio = function(_aud, customTable)
                 })
         end
         
-        -- special case for custom values: pass the real audipt object as the first argument, and the fake object as the second
+        -- pass the real object as the first argument, and the fake object as the second
         for k, v in pairs(customTable) do
             if type(aud[k]) == "table" then -- allow properties and functions to be set to nil
                 setmetatable(aud[k], {
@@ -1893,7 +1893,7 @@ local wrapAudio = function(_aud, customTable)
                         _aud.SetSoundDictionary(key, value)
                     else
                         if aud[key].set then
-                            -- for custom values only: pass the real sprite object, then the fake one, then the value
+                            -- pass the real object, then the fake one, then the value
                             if customTable[key] then
                                 return aud[key].set(_aud, returnTab, value)
                             else
@@ -2022,7 +2022,7 @@ local wrapNewAudio = function(_new, customTable)
                 })
         end
         
-        -- special case for custom values: pass the real newipt object as the first argument, and the fake object as the second
+        -- pass the real object as the first argument, and the fake object as the second
         for k, v in pairs(customTable) do
             if type(new[k]) == "table" then -- allow properties and functions to be set to nil
                 setmetatable(new[k], {
@@ -2055,7 +2055,7 @@ local wrapNewAudio = function(_new, customTable)
                 end,
                 __newindex = function(_, key, value)
                     if new[key].set then
-                        -- for custom values only: pass the real sprite object, then the fake one, then the value
+                        -- pass the real object, then the fake one, then the value
                         if customTable[key] then
                             return new[key].set(_new, returnTab, value)
                         else
@@ -2185,7 +2185,7 @@ local wrapInput = function(_inp, customTable)
                 })
         end
         
-        -- special case for custom values: pass the real Input object as the first argument, and the fake object as the second
+        -- pass the real object as the first argument, and the fake object as the second
         for k, v in pairs(customTable) do
             if type(inp[k]) == "table" then -- allow properties and functions to be set to nil
                 setmetatable(inp[k], {
@@ -2218,7 +2218,7 @@ local wrapInput = function(_inp, customTable)
                 end,
                 __newindex = function(_, key, value)
                     if inp[key].set then
-                        -- for custom values only: pass the real input object, then the fake one, then the value
+                        -- pass the real object, then the fake one, then the value
                         if customTable[key] then
                             return inp[key].set(_inp, returnTab, value)
                         else
@@ -2346,7 +2346,7 @@ local wrapTime = function(_tim, customTable)
                 })
         end
         
-        -- special case for custom values: pass the real timut object as the first argument, and the fake object as the second
+        -- pass the real object as the first argument, and the fake object as the second
         for k, v in pairs(customTable) do
             if type(tim[k]) == "table" then -- allow properties and functions to be set to nil
                 setmetatable(tim[k], {
@@ -2379,7 +2379,7 @@ local wrapTime = function(_tim, customTable)
                 end,
                 __newindex = function(_, key, value)
                     if tim[key].set then
-                        -- for custom values only: pass the real Time object, then the fake one, then the value
+                        -- pass the real object as the first argument, and the fake object as the second
                         if customTable[key] then
                             return tim[key].set(_tim, returnTab, value)
                         else
@@ -2508,7 +2508,7 @@ local wrapMisc = function(_mis, customTable)
                 })
         end
         
-        -- special case for custom values: pass the real Misc object as the first argument, and the fake object as the second
+        -- pass the real object as the first argument, and the fake object as the second
         for k, v in pairs(customTable) do
             if type(mis[k]) == "table" then -- allow properties and functions to be set to nil
                 setmetatable(mis[k], {
@@ -2541,7 +2541,7 @@ local wrapMisc = function(_mis, customTable)
                 end,
                 __newindex = function(_, key, value)
                     if mis[key].set then
-                        -- for custom values only: pass the real Misc object, then the fake one, then the value
+                        -- pass the real object, then the fake one, then the value
                         if customTable[key] then
                             return mis[key].set(_mis, returnTab, value)
                         else
@@ -2691,7 +2691,7 @@ local wrapArena = function(_are, customTable)
                 })
         end
         
-        -- special case for custom values: pass the real Arena object as the first argument, and the fake object as the second
+        -- pass the real object as the first argument, and the fake object as the second
         for k, v in pairs(customTable) do
             if type(are[k]) == "table" then -- allow properties and functions to be set to nil
                 setmetatable(are[k], {
@@ -2724,7 +2724,7 @@ local wrapArena = function(_are, customTable)
                 end,
                 __newindex = function(_, key, value)
                     if are[key].set then
-                        -- for custom values only: pass the real Arena object, then the fake one, then the value
+                        -- pass the real object, then the fake one, then the value
                         if customTable[key] then
                             return are[key].set(_are, returnTab, value)
                         else
@@ -2843,7 +2843,7 @@ local wrapInventory = function(_inv, customTable)
                 })
         end
         
-        -- special case for custom values: pass the real invna object as the first argument, and the fake object as the second
+        -- pass the real object as the first argument, and the fake object as the second
         for k, v in pairs(customTable) do
             if type(inv[k]) == "table" then -- allow properties and functions to be set to nil
                 setmetatable(inv[k], {
@@ -2876,7 +2876,7 @@ local wrapInventory = function(_inv, customTable)
                 end,
                 __newindex = function(_, key, value)
                     if inv[key].set then
-                        -- for custom values only: pass the real Inventory object, then the fake one, then the value
+                        -- pass the real object, then the fake one, then the value
                         if customTable[key] then
                             return inv[key].set(_inv, returnTab, value)
                         else
