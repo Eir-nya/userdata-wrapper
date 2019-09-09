@@ -900,7 +900,7 @@ function self.WrapSprite(_spr, customTable)
                     end
                 end,
                 __eq = function(o1, o2)
-                    return _spr
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
                 end,
                 __tostring = function()
                     return tostring(_spr)
@@ -1115,7 +1115,7 @@ function self.WrapProjectile(_prj, customTable)
                     end
                 end,
                 __eq = function(o1, o2)
-                    return _prj
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
                 end,
                 __tostring = function()
                     return tostring(_prj)
@@ -1293,7 +1293,7 @@ function self.WrapScript(_scr, customTable)
                     end
                 end,
                 __eq = function(o1, o2)
-                    return _scr
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
                 end,
                 __tostring = function()
                     return tostring(_scr)
@@ -1520,7 +1520,7 @@ function self.WrapText(_txt, customTable)
                     end
                 end,
                 __eq = function(o1, o2)
-                    return _txt
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
                 end,
                 __tostring = function()
                     return tostring(_txt)
@@ -1726,7 +1726,7 @@ local wrapPlayer = function(_pla, customTable)
                     end
                 end,
                 __eq = function(o1, o2)
-                    return _pla
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
                 end,
                 __tostring = function()
                     return tostring(_pla)
@@ -1909,7 +1909,7 @@ local wrapAudio = function(_aud, customTable)
                     end
                 end,
                 __eq = function(o1, o2)
-                    return _aud
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
                 end,
                 __tostring = function()
                     return tostring(_aud)
@@ -2070,7 +2070,7 @@ local wrapNewAudio = function(_new, customTable)
                     end
                 end,
                 __eq = function(o1, o2)
-                    return _new
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
                 end,
                 __tostring = function()
                     return tostring(_new)
@@ -2233,7 +2233,7 @@ local wrapInput = function(_inp, customTable)
                     end
                 end,
                 __eq = function(o1, o2)
-                    return _inp
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
                 end,
                 __tostring = function()
                     return tostring(_inp)
@@ -2394,7 +2394,7 @@ local wrapTime = function(_tim, customTable)
                     end
                 end,
                 __eq = function(o1, o2)
-                    return _tim
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
                 end,
                 __tostring = function()
                     return tostring(_tim)
@@ -2556,7 +2556,7 @@ local wrapMisc = function(_mis, customTable)
                     end
                 end,
                 __eq = function(o1, o2)
-                    return _mis
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
                 end,
                 __tostring = function()
                     return tostring(_mis)
@@ -2739,7 +2739,7 @@ local wrapArena = function(_are, customTable)
                     end
                 end,
                 __eq = function(o1, o2)
-                    return _are
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
                 end,
                 __tostring = function()
                     return tostring(_are)
@@ -2891,7 +2891,7 @@ local wrapInventory = function(_inv, customTable)
                     end
                 end,
                 __eq = function(o1, o2)
-                    return _inv
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
                 end,
                 __tostring = function()
                     return tostring(_inv)
