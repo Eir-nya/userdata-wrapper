@@ -22,7 +22,7 @@
 |    |                       |    |                 |    |
 |====|==============================================|====|
 | ♣  |     For |Unitale| and |Create Your Frisk|    |  ♠ |
-|    |         |v0.2.1a|     |     v0.6.2.2    |    |    |
+|    |         |v0.2.1a|     |      v0.6.3     |    |    |
 \====\==============================================/====/
 
 A library providing functions you can use to wrap userdata objects in Unitale and Create Your Frisk.
@@ -427,6 +427,13 @@ Now, for the full list of variables and functions for this library:
     all you have to do is pass a wrapped userdata OR a regular userdata. With this variable set to false, you would
     always have to pass a regular userdata value.
 
+* wrapper.autoWrapFile:
+  
+  = boolean = true
+  - Set this to true, and whenever you use `Misc.OpenFile` from the wrapped Misc object, it will, *by default*, return a wrapped File object.
+    I say "by default" because if you provide your own custom `OpenFile` function, it will be used instead (nothing unique to this variable).
+  - If this is true, then the values in `wrapper.fileValues` will be applied to any File objects created from the wrapped Misc object.
+
 * wrapper.disguise
   
   = boolean = false
@@ -463,7 +470,8 @@ Now, for the full list of variables and functions for this library:
 * wrapper.WrapSprite(sprite, overrideTable = nil),
 * wrapper.WrapProjectile(projectile, overrideTable = nil),
 * wrapper.WrapScript(script, overrideTable = nil),
-* wrapper.WrapText(text, overrideTable = nil)
+* wrapper.WrapText(text, overrideTable = nil),
+* wrapper.WrapFile(file, overrideTable = nil),
   
   = takes 1 "multi-instance" userdata from Unitale/CYF, and one OPTIONAL override table (see section (OVER))
   - Returns a single table with metatables that "wraps" a given Unitale/CYF userdata object.
@@ -560,12 +568,16 @@ And, finally:
 local self = {}
 
 -- set this to true to automatically wrap `projectile.sprite` for `CreateProjectile` and `CreateProjectileAbs`
--- and `Player.sprite` for `Player`
+-- (if wrapped) and `Player.sprite` for `Player` (if wrapped)
 self.autoWrapSprite = true
 
 -- set this to true, and the default functions that take userdata values as arguments will be changed to
 -- automatically unwrap whatever values you enter into them.
 self.autoUnwrapUserdata = true
+
+-- set this to true, and the default function `Misc.OpenFile` will be changed to automatically return a wrapped
+-- File object instead of a regular userdata one.
+self.autoWrapFile = true
 
 -- set this to true, and all wrapped objects will "disguise" themselves as userdata
 -- meaning: they will create error messages when you try to access a property that doesn't exist, try to get
@@ -628,6 +640,11 @@ self.scriptValues = {
 
 -- enter items in this table to override the default get/set functions from the wrapper!
 self.textValues = {
+    
+}
+
+-- enter items in this table to override the default get/set functions from the wrapper!
+self.fileValues = {
     
 }
 
@@ -694,9 +711,9 @@ function self.WrapSprite(_spr, customTable)
         -- spritename, isactive, width, height, animcomplete, totaltime
         -- 
         -- Can be Get and Set:
-        -- _img, nativeSizeDelta, keyframes, data, tag, x, y, z, absx, absy, absz, xscale, yscale, loopmode,
-        -- color, color32, alpha, alpha32, rotation, layer, animationpaused, currentframe, currenttime,
-        -- animationspeed
+        -- _img, nativeSizeDelta, keyframes, data, tag, x, y, z, absx, absy, absz, xscale, yscale, xpivot,
+        -- ypivot, loopmode, color, color32, alpha, alpha32, rotation, layer, animationpaused, currentframe,
+        -- currenttime, animationspeed
         -- 
         -- Functions:
         -- Set, SetParent, SetPivot, SetAnchor, Move, MoveTo, MoveToAbs, Scale, SetAnimation,
@@ -706,7 +723,7 @@ function self.WrapSprite(_spr, customTable)
         -- Yes
         
         -- Can only be Get:
-        if Encounter and Encounter["isCYF"] or isCYF then
+        if isCYF then
             spr.spritename = {get = function() return _spr.spritename   end}
             spr.totaltime  = {get = function() return _spr.totaltime    end}
         end
@@ -716,7 +733,7 @@ function self.WrapSprite(_spr, customTable)
         spr.height         = {get = function() return _spr.height       end}
         
         -- Can be Get and Set:
-        if Encounter and Encounter["isCYF"] or isCYF then
+        if isCYF then
             spr._img            = {get = function() return _spr._img            end, set = function(val) _spr._img = val            end}
             spr.nativeSizeDelta = {get = function() return _spr.nativeSizeDelta end, set = function(val) _spr.nativeSizeDelta = val end}
             spr.keyframes       = {get = function() return _spr.keyframes       end, set = function(val) _spr.keyframes = val       end}
@@ -726,6 +743,8 @@ function self.WrapSprite(_spr, customTable)
             spr.absy            = {get = function() return _spr.absy            end, set = function(val) _spr.absy = val            end}
             spr.z               = {get = function() return _spr.z               end, set = function(val) _spr.z = val               end}
             spr.absz            = {get = function() return _spr.absz            end, set = function(val) _spr.absz = val            end}
+            spr.xpivot          = {get = function() return _spr.xpivot          end, set = function(val) _spr.xpivot = val          end}
+            spr.ypivot          = {get = function() return _spr.ypivot          end, set = function(val) _spr.ypivot = val          end}
             spr.loopmode        = {get = function() return _spr.loopmode        end, set = function(val) _spr.loopmode = val        end}
             spr.color32         = {get = function() return _spr.color32         end, set = function(val) _spr.color32 = val         end}
             spr.alpha32         = {get = function() return _spr.alpha32         end, set = function(val) _spr.alpha32 = val         end}
@@ -744,7 +763,7 @@ function self.WrapSprite(_spr, customTable)
         spr.rotation            = {get = function() return _spr.rotation        end, set = function(val) _spr.rotation = val        end}
         
         -- Functions:
-        if Encounter and Encounter["isCYF"] or isCYF then
+        if isCYF then
             spr.MoveBelow     = {set = function(...) return _spr.MoveBelow(...)     end}
             spr.MoveAbove     = {set = function(...) return _spr.MoveAbove(...)     end}
             spr.Dust          = {set = function(...) return _spr.Dust(...)          end}
@@ -773,26 +792,26 @@ function self.WrapSprite(_spr, customTable)
     do
         if self.autoUnwrapUserdata then
             spr.SetParent = {set = function(other)
-                    if type(other) == "table" then
-                        return _spr.SetParent(other.userdata)
-                    else
-                        return _spr.SetParent(other)
-                    end
-                end}
+                if type(other) == "table" then
+                    return _spr.SetParent(other.userdata)
+                else
+                    return _spr.SetParent(other)
+                end
+            end}
             spr.MoveAbove = {set = function(other)
-                    if type(other) == "table" then
-                        return _spr.MoveAbove(other.userdata)
-                    else
-                        return _spr.MoveAbove(other)
-                    end
-                end}
+                if type(other) == "table" then
+                    return _spr.MoveAbove(other.userdata)
+                else
+                    return _spr.MoveAbove(other)
+                end
+            end}
             spr.MoveBelow = {set = function(other)
-                    if type(other) == "table" then
-                        return _spr.MoveBelow(other.userdata)
-                    else
-                        return _spr.MoveBelow(other)
-                    end
-                end}
+                if type(other) == "table" then
+                    return _spr.MoveBelow(other.userdata)
+                else
+                    return _spr.MoveBelow(other)
+                end
+            end}
         end
         
         for index, newvalue in pairs(customTable) do
@@ -835,7 +854,7 @@ function self.WrapSprite(_spr, customTable)
     do
         local returnTab = {}
         
-        -- make every "property" of this table act like setting and getting the real property from the real sprite
+        -- make every "property" of this table act like setting and getting the real property from the real sprite object
         for _, v in pairs(spr) do
             setmetatable(v, {
                     __call = function(tab, ...)
@@ -862,7 +881,7 @@ function self.WrapSprite(_spr, customTable)
         setmetatable(returnTab, {
                 __index = function(_, index)
                     -- allow for `sprite["variable"]`
-                    if (Encounter and Encounter["isCYF"] or isCYF) and _spr[index] and not customTable[index] then
+                    if isCYF and _spr[index] and not customTable[index] then
                         return _spr.GetVar(index)
                     elseif spr[index] then
                         if spr[index].get then
@@ -880,7 +899,7 @@ function self.WrapSprite(_spr, customTable)
                 end,
                 __newindex = function(_, key, value)
                     -- allow for `sprite["variable"] = value`
-                    if (Encounter and Encounter["isCYF"] or isCYF) and not spr[key] then
+                    if isCYF and not spr[key] then
                         _spr.SetVar(key, value)
                     else
                         if spr[key].set then
@@ -980,10 +999,10 @@ function self.WrapProjectile(_prj, customTable)
         -- Yes
         
         -- Can only be Get:
-        if Encounter and Encounter["isCYF"] or isCYF then
+        if isCYF then
             prj.isColliding = {get = function() return _prj.isColliding end}
             prj.ppchanged   = {get = function() return _prj.ppchanged   end}
-        elseif not isCYF and ((Encounter and not Encounter["isCYF"]) or not Encounter) then
+        else
             prj.x           = {get = function() return _prj.x           end}
             prj.y           = {get = function() return _prj.y           end}
             prj.absx        = {get = function() return _prj.absx        end}
@@ -995,7 +1014,7 @@ function self.WrapProjectile(_prj, customTable)
         prj.isactive        = {get = function() return _prj.isactive    end}
         
         -- Can be Get and Set:
-        if Encounter and Encounter["isCYF"] or isCYF then
+        if isCYF then
             prj.ppcollision  = {get = function() return _prj.ppcollision  end, set = function(val) _prj.ppcollision = val  end}
             prj.isPersistent = {get = function() return _prj.isPersistent end, set = function(val) _prj.isPersistent = val end}
             prj.layer        = {get = function() return _prj.layer        end, set = function(val) _prj.layer = val        end}
@@ -1006,9 +1025,9 @@ function self.WrapProjectile(_prj, customTable)
         end
         
         -- Functions:
-        if Encounter and Encounter["isCYF"] or isCYF then
+        if isCYF then
             prj.ResetCollisionSystem = {set = function(...) return _prj.ResetCollisionSystem(...) end}
-        elseif not isCYF and ((Encounter and not Encounter["isCYF"]) or not Encounter) then
+        else
             prj.UpdatePosition       = {set = function(...) return _prj.UpdatePosition(...)       end}
         end
         prj.Remove                   = {set = function(...) return _prj.Remove(...)               end}
@@ -1029,8 +1048,8 @@ function self.WrapProjectile(_prj, customTable)
         if self.autoWrapSprite then
             prj.sprite = {
                 get = function()
-                        return spr
-                    end
+                    return spr
+                end
             }
         end
         
@@ -1050,7 +1069,7 @@ function self.WrapProjectile(_prj, customTable)
     do
         local returnTab = {}
         
-        -- make every "property" of this table act like setting and getting the real property from the real projectile
+        -- make every "property" of this table act like setting and getting the real property from the real projectile object
         for k, v in pairs(prj) do
             setmetatable(v, {
                     __call = function(tab, ...)
@@ -1077,7 +1096,7 @@ function self.WrapProjectile(_prj, customTable)
         setmetatable(returnTab, {
                 __index = function(_, index)
                     -- allow for `projectile["variable"]`
-                    if (Encounter and Encounter["isCYF"] or isCYF) and not prj[index] then
+                    if isCYF and not prj[index] then
                         return _prj.GetVar(index)
                     elseif prj[index] then
                         if prj[index].get then
@@ -1095,7 +1114,7 @@ function self.WrapProjectile(_prj, customTable)
                 end,
                 __newindex = function(_, key, value)
                     -- allow for `projectile["variable"] = value`
-                    if (Encounter and Encounter["isCYF"] or isCYF) and not prj[key] then
+                    if isCYF and not prj[key] then
                         _prj.SetVar(key, value)
                     else
                         if prj[key].set then
@@ -1193,7 +1212,7 @@ function self.WrapScript(_scr, customTable)
         -- (none)
         
         -- Can be Get and Set:
-        if Encounter and Encounter["isCYF"] or isCYF then
+        if isCYF then
             scr.instances     = {get = function() return _scr.instances     end, set = function(val) _scr.instances = val     end}
             scr.script        = {get = function() return _scr.script        end, set = function(val) _scr.script = val        end}
             scr.scriptname    = {get = function() return _scr.scriptname    end, set = function(val) _scr.scriptname = val    end}
@@ -1228,7 +1247,7 @@ function self.WrapScript(_scr, customTable)
     do
         local returnTab = {}
         
-        -- make every "property" of this table act like setting and getting the real property from the real projectile
+        -- make every "property" of this table act like setting and getting the real property from the real script object
         for k, v in pairs(scr) do
             setmetatable(v, {
                     __call = function(tab, ...)
@@ -1320,6 +1339,10 @@ end
 -- usage: `text = WrapText(text, customTable)`
 -- you can provide values to be used here by changing this library's `textValues` table
 function self.WrapText(_txt, customTable)
+    if not isCYF then
+        error("The Text object is exclusive to CYF.", 2)
+    end
+    
     local txt = {}
     
     if not customTable then
@@ -1351,22 +1374,23 @@ function self.WrapText(_txt, customTable)
         -- Charset
         -- 
         -- Can be Get and Set:
-        -- progressmode, x, y, absx, absy, textMaxWidth, bubbleHeight, layer, _color, hasColorBeenSet,
-        -- hasAlphaBeenSet, color, color32, alpha, alpha32,
+        -- progressmode, x, y, absx, absy, textMaxWidth, bubbleHeight, xscale, yscale, layer, _color,
+        -- hasColorBeenSet, hasAlphaBeenSet, color, color32, alpha, alpha32,
         --
         -- letterSound, letters, currentLine, currentReferenceCharacter, nextMonsterDialogueOnce, nmd2,
         -- wasStated, offset, caller, textQueue, blockSkip, hidden, skipNowIfBlocked, LateStartWaiting
         -- 
         -- Functions:
-        -- MoveBelow, MoveAbove, SetParent, SetText, LateStart, AddText, SetVoice, SetFont, SetEffect,
-        -- IsTheLineFinished, IsTheTextFinished, ShowBubble, SetSpeechThingPositionAndSide, HideBubble,
-        -- NextLine, SetAutoWaitTimeBetweenTexts, MoveTo, MoveToAbs, SetPivot, GetTextWidth, GetTextHeight
+        -- DestroyText, Remove, Scale, MoveBelow, MoveAbove, SetParent, SetText, LateStart, AddText,
+        -- SetVoice, SetFont, SetEffect, IsTheLineFinished, IsTheTextFinished, ShowBubble,
+        -- SetSpeechThingPositionAndSide, HideBubble, NextLine, SetAutoWaitTimeBetweenTexts, MoveTo,
+        -- MoveToAbs, SetPivot, GetTextWidth, GetTextHeight,
         --
-        -- SetCaller, SetHorizontalSpacing, SetVerticalSpacing, ResetFont, SetPause, IsPaused, IsFinished,
-        -- SetMute, SetTextQueue, SetTextQueueAfterValue, ResetCurrentCharacter, AddToTextQueue,
-        -- CanSkip, CanAutoSkip, CanAutoSkipThis, CanAutoSkipAll, LineCount, SetOffset, LineComplete,
-        -- AllLinesComplete, SetTextFrameAlpha, HasNext, NextLineText, SkipText, DoSkipFromPlayer,
-        -- SkipLine, CharacterCount, DestroyText
+        -- SetCaller, SetHorizontalSpacing, SetVerticalSpacing, ResetFont, SetPause, IsPaused,
+        -- IsFinished, SetMute, SetTextQueue, SetTextQueueAfterValue, ResetCurrentCharacter,
+        -- AddToTextQueue, CanSkip, CanAutoSkip, CanAutoSkipThis, CanAutoSkipAll, LineCount,
+        -- SetOffset, LineComplete, AllLinesComplete, SetTextFrameAlpha, HasNext, NextLineText,
+        -- SkipText, DoSkipFromPlayer, SkipLine, CharacterCount, DestroyChars
         --
         -- Object[variable] enabled?
         -- No
@@ -1381,8 +1405,9 @@ function self.WrapText(_txt, customTable)
         end
         
         -- Can be Get and Set:
-        local getAndSet = {"progressmode", "x", "y", "absx", "absy", "textMaxWidth", "bubbleHeight", "layer",
-            "_color", "hasColorBeenSet", "hasAlphaBeenSet", "color", "color32", "alpha", "alpha32",
+        local getAndSet = {"progressmode", "x", "y", "absx", "absy", "textMaxWidth", "bubbleHeight",
+            "xscale", "yscale", "layer", "_color", "hasColorBeenSet", "hasAlphaBeenSet", "color", "color32",
+            "alpha", "alpha32",
             
             "letterSound", "letters", "currentLine", "currentReferenceCharacter", "nextMonsterDialogueOnce",
             "nmd2", "wasStated", "offset", "caller", "textQueue", "blockSkip", "hidden", "skipNowIfBlocked",
@@ -1393,16 +1418,17 @@ function self.WrapText(_txt, customTable)
         end
         
         -- Functions:
-        local functions = {"MoveBelow", "MoveAbove", "SetParent", "SetText", "LateStart", "AddText", "SetVoice",
-            "SetFont", "SetEffect", "IsTheLineFinished", "IsTheTextFinished", "ShowBubble",
-            "SetSpeechThingPositionAndSide", "HideBubble", "NextLine", "SetAutoWaitTimeBetweenTexts", "MoveTo",
-            "MoveToAbs", "SetPivot", "GetTextWidth", "GetTextHeight",
+        local functions = {"DestroyText", "Remove", "Scale", "MoveBelow", "MoveAbove", "SetParent",
+            "SetText", "LateStart", "AddText", "SetVoice", "SetFont", "SetEffect", "IsTheLineFinished",
+            "IsTheTextFinished", "ShowBubble", "SetTail", "SetSpeechThingPositionAndSide", "HideBubble",
+            "NextLine", "SetWaitTime", "SetAutoWaitTimeBetweenTexts", "MoveTo", "MoveToAbs", "SetPivot",
+            "GetTextWidth", "GetTextHeight",
             
             "SetCaller", "SetHorizontalSpacing", "SetVerticalSpacing", "ResetFont", "SetPause", "IsPaused",
             "IsFinished", "SetMute", "SetTextQueue", "SetTextQueueAfterValue", "ResetCurrentCharacter",
             "AddToTextQueue", "CanSkip", "CanAutoSkip", "CanAutoSkipThis", "CanAutoSkipAll", "LineCount",
             "SetOffset", "LineComplete", "AllLinesComplete", "SetTextFrameAlpha", "HasNext", "NextLineText",
-            "SkipText", "DoSkipFromPlayer", "SkipLine", "CharacterCount", "DestroyText"}
+            "SkipText", "DoSkipFromPlayer", "SkipLine", "CharacterCount", "DestroyChars"}
         
         for _, name in pairs(functions) do
             txt[name] = {set = function(...) return _txt[name](...) end}
@@ -1416,33 +1442,33 @@ function self.WrapText(_txt, customTable)
     do
         if self.autoUnwrapUserdata then
             txt.SetParent = {set = function(spr)
-                    if type(spr) == "table" then
-                        return _txt.SetParent(spr.userdata)
-                    else
-                        return _txt.SetParent(spr)
-                    end
-                end}
+                if type(spr) == "table" then
+                    return _txt.SetParent(spr.userdata)
+                else
+                    return _txt.SetParent(spr)
+                end
+            end}
             txt.MoveAbove = {set = function(other)
-                    if type(other) == "table" then
-                        return _real.MoveAbove(other.userdata)
-                    else
-                        return _real.MoveAbove(other)
-                    end
-                end}
+                if type(other) == "table" then
+                    return _real.MoveAbove(other.userdata)
+                else
+                    return _real.MoveAbove(other)
+                end
+            end}
             txt.MoveBelow = {set = function(other)
-                    if type(other) == "table" then
-                        return _real.MoveBelow(other.userdata)
-                    else
-                        return _real.MoveBelow(other)
-                    end
-                end}
+                if type(other) == "table" then
+                    return _real.MoveBelow(other.userdata)
+                else
+                    return _real.MoveBelow(other)
+                end
+            end}
             txt.SetCaller = {set = function(scr)
-                    if type(scr) == "table" then
-                        return _real.SetCaller(scr.userdata)
-                    else
-                        return _real.SetCaller(scr)
-                    end
-                end}
+                if type(scr) == "table" then
+                    return _real.SetCaller(scr.userdata)
+                else
+                    return _real.SetCaller(scr)
+                end
+            end}
         end
         
         for index, newvalue in pairs(customTable) do
@@ -1461,7 +1487,7 @@ function self.WrapText(_txt, customTable)
     do
         local returnTab = {}
         
-        -- make every "property" of this table act like setting and getting the real property from the real projectile
+        -- make every "property" of this table act like setting and getting the real property from the real text object
         for k, v in pairs(txt) do
             setmetatable(v, {
                     __call = function(tab, ...)
@@ -1544,6 +1570,170 @@ function self.WrapText(_txt, customTable)
     end
 end
 
+-- usage: `file = WrapFile(file, customTable)`
+-- you can provide values to be used here by changing this library's `fileValues` table
+function self.WrapFile(_fil, customTable)
+    if not isCYF then
+        error("The File object is exclusive to CYF.", 2)
+    end
+    
+    local fil = {}
+    
+    if not customTable then
+        -- copy `self.fileValues` to `customTable`
+        customTable = {}
+        
+        for k, v in pairs(self.fileValues) do
+            -- every item in `self.fileValues` is a name-keyed table with at least one function named at the key `get` or `set`
+            customTable[k] = { set = v.set, get = v.get }
+        end
+    end
+    
+    --------------------------------------
+    ---- DEFAULT VALUES AND FUNCTIONS ----
+    --------------------------------------
+    
+    do
+        -- LuaFile stats:
+        --
+        -- UNITALE:
+        --
+        -- N/A
+        --
+        -- CYF:
+        --
+        -- Can only be Get:
+        -- lineCount, openMode
+        -- 
+        -- Can be Get and Set:
+        -- (none)
+        -- 
+        -- Functions:
+        -- ReadLine, ReadLines, Write, ReplaceLine, DeleteLine, Delete
+        --
+        -- Object[variable] enabled?
+        -- No
+        
+        -- Can only be Get:
+        fil.lineCount = {get = function() return _fil.lineCount end}
+        fil.openMode  = {get = function() return _fil.openMode  end}
+        
+        -- Can be Get and Set:
+        -- (none)
+        
+        -- Functions:
+        fil.ReadLine    = {set = function(...) return _fil.ReadLine(...)    end}
+        fil.ReadLines   = {set = function(...) return _fil.ReadLines(...)   end}
+        fil.Write       = {set = function(...) return _fil.Write(...)       end}
+        fil.ReplaceLine = {set = function(...) return _fil.ReplaceLine(...) end}
+        fil.DeleteLine  = {set = function(...) return _fil.DeleteLine(...)  end}
+        fil.Delete      = {set = function(...) return _fil.Delete(...)      end}
+    end
+    
+    -------------------------------------
+    ---- CUSTOM VALUES AND FUNCTIONS ----
+    -------------------------------------
+    
+    do
+        for index, newvalue in pairs(customTable) do
+            fil[index] = newvalue
+        end
+        
+        fil.userdata = {get = function() -- cannot be overwritten
+            return _fil
+        end}
+    end
+    
+    -----------------------------------
+    ---- OTHER WRAPPER NECESSITIES ----
+    -----------------------------------
+    
+    do
+        local returnTab = {}
+        
+        -- make every "property" of this table act like setting and getting the real property from the real file object
+        for k, v in pairs(fil) do
+            setmetatable(v, {
+                    __call = function(tab, ...)
+                        if tab.set then
+                            return tab.set(...)
+                        end
+                    end
+                })
+        end
+        
+        -- pass the real object as the first argument, and the fake object as the second
+        for k, v in pairs(customTable) do
+            if type(fil[k]) == "table" then -- allow properties and functions to be set to nil
+                setmetatable(fil[k], {
+                        __call = function(tab, ...)
+                            if tab.set then
+                                return tab.set(_fil, returnTab, ...)
+                            end
+                        end
+                    })
+            end
+        end
+        
+        setmetatable(returnTab, {
+                __index = function(_, index)
+                    if fil[index] then
+                        if fil[index].get then
+                            return fil[index].get(_fil, returnTab)
+                        elseif fil[index].set then -- if a property has set but not get, it must be a function
+                            return fil[index] -- in that case, this line will access the "set" value retrieved above
+                        end
+                    else
+                        error("cannot access field " .. tostring(index) .. " of wrapped userdata <" .. tostring(_fil) .. ">", 2)
+                    end
+                    
+                    if self.disguise then
+                        error("cannot access field " .. tostring(index) .. " of userdata <" .. tostring(_fil) .. ">", 2)
+                    else
+                        return nil
+                    end
+                end,
+                __newindex = function(_, key, value)
+                    if fil[key].set then
+                        -- pass the real object, then the fake one, then the value
+                        if customTable[key] then
+                            return fil[key].set(_fil, returnTab, value)
+                        else
+                            return fil[key].set(value)
+                        end
+                    end
+                    
+                    if self.disguise then
+                        error("cannot access field " .. tostring(index) .. " of userdata <" .. tostring(_fil) .. ">", 2)
+                    else
+                        return nil
+                    end
+                end,
+                __eq = function(o1, o2)
+                    return (pcall(function() return o1.userdata end) and o1.userdata or o1) == (pcall(function() return o2.userdata end) and o2.userdata or o2)
+                end,
+                __tostring = function()
+                    return tostring(_fil)
+                end,
+                __call = function(_, ...)
+                    error(self.disguise and "attempt to call a userdata value" or "attempt to call a wrapped userdata value", 2)
+                end,
+                __metatable = not self.disguise and _fil or nil,
+                __len = function(_)
+                    error(self.disguise and "attempt to get length of a userdata value" or "attempt to get length of a wrapped userdata value", 2)
+                end,
+                __pairs = function(_, k)
+                    error(self.disguise and "bad argument #1 to 'next' (table expected, got userdata)" or "bad argument #1 to 'next' (table expected, got wrapped userdata)", 2)
+                end,
+                __ipairs = function(_, k)
+                    error(self.disguise and "bad argument #1 to '!!next_i!!' (table expected, got userdata)" or "bad argument #1 to '!!next_i!!' (table expected, got wrapped userdata)", 2)
+                end
+            })
+        
+        return returnTab
+    end
+end
+
 -- this is an internal function! you can't call it yourself, or bad things would happen.
 local wrapPlayer = function(_pla, customTable)
     local spr
@@ -1552,6 +1742,7 @@ local wrapPlayer = function(_pla, customTable)
     end
     
     local pla = {}
+    customTable = customTable and customTable or {}
     
     --------------------------------------
     ---- DEFAULT VALUES AND FUNCTIONS ----
@@ -1577,15 +1768,16 @@ local wrapPlayer = function(_pla, customTable)
         -- CYF:
         -- 
         -- Can only be Get:
-        -- x, y, absx, absy, sprite, maxhp, MaxHPShift, maxhpshift, atk, weapon, weaponatk, def,
-        -- armor, armordef, lastenemychosen, lasthitmultiplier, isHurting, ishurting, isMoving, ismoving
+        -- x, y, absx, absy, sprite, maxhp, MaxHPShift, maxhpshift, weapon, weaponatk, armor, armordef,
+        -- lastenemychosen, lasthitmultiplier, isHurting, ishurting, isMoving, ismoving
         -- 
         -- Can be Get and Set:
-        -- hp, name, lv
+        -- hp, atk, def, name, lv
         -- 
         -- Functions:
         -- Hurt, Heal, SetControlOverride, Move, MoveTo, MoveToAbs, ForceHP, SetMaxHPShift, setMaxHPShift,
-        -- SetAttackAnim, ResetAttackAnim, ChangeTarget, ForceAttack, MultiTarget, ForceMultiAttack, CheckDeath
+        -- ResetStats, SetAttackAnim, ResetAttackAnim, ChangeTarget, ForceAttack, MultiTarget,
+        -- ForceMultiAttack, CheckDeath
         --
         -- Object[variable] enabled?
         -- No
@@ -1593,8 +1785,8 @@ local wrapPlayer = function(_pla, customTable)
         -- Can only be Get:
         local onlyGet = {"x", "y", "absx", "absy", "isHurting", "isMoving"}
         
-        if Encounter and Encounter["isCYF"] or isCYF then
-            local add = {"maxhp", "MaxHPShift", "maxhpshift", "atk", "weapon", "weaponatk", "def", "armor", "armordef",
+        if isCYF then
+            local add = {"maxhp", "MaxHPShift", "maxhpshift", "weapon", "weaponatk", "armor", "armordef",
                 "lastenemychosen", "lasthitmultiplier", "ishurting", "ismoving"}
             
             for _, v in pairs(add) do
@@ -1611,7 +1803,7 @@ local wrapPlayer = function(_pla, customTable)
         end
         
         -- Can be Get and Set:
-        local getAndSet = {"hp", "name", "lv"}
+        local getAndSet = {"hp", "atk", "def", "name", "lv"}
         
         for _, name in pairs(getAndSet) do
             pla[name] = {get = function() return _pla[name] end, set = function(val) _pla[name] = val end}
@@ -1620,9 +1812,9 @@ local wrapPlayer = function(_pla, customTable)
         -- Functions:
         local functions = {"Hurt", "Heal", "SetControlOverride", "MoveTo", "MoveToAbs"}
         
-        if Encounter and Encounter["isCYF"] or isCYF then
-            local add = {"Move", "ForceHP", "SetMaxHPShift", "setMaxHPShift", "SetAttackAnim", "ResetAttackAnim",
-            "ChangeTarget", "ForceAttack", "MultiTarget", "ForceMultiAttack", "CheckDeath"}
+        if isCYF then
+            local add = {"Move", "ForceHP", "SetMaxHPShift", "setMaxHPShift", "ResetStats", "SetAttackAnim",
+            "ResetAttackAnim", "ChangeTarget", "ForceAttack", "MultiTarget", "ForceMultiAttack", "CheckDeath"}
             
             for _, v in pairs(add) do
                 table.insert(functions, v)
@@ -1665,7 +1857,7 @@ local wrapPlayer = function(_pla, customTable)
     do
         local returnTab = {}
         
-        -- make every "property" of this table act like setting and getting the real property from the real Player
+        -- make every "property" of this table act like setting and getting the real property from the real player object
         for k, v in pairs(pla) do
             setmetatable(v, {
                     __call = function(tab, ...)
@@ -1753,6 +1945,7 @@ end
 -- this is an internal function! you can't call it yourself, or bad things would happen.
 local wrapAudio = function(_aud, customTable)
     local aud = {}
+    customTable = customTable and customTable or {}
     
     --------------------------------------
     ---- DEFAULT VALUES AND FUNCTIONS ----
@@ -1781,7 +1974,7 @@ local wrapAudio = function(_aud, customTable)
         -- IsPlaying, isPlaying, totaltime
         -- 
         -- Can be Get and Set:
-        -- src, hiddenDictionary, filename, playtime
+        -- instance, src, hiddenDictionary, filename, playtime
         -- 
         -- Functions:
         -- Play, Stop, Pause, Unpause, Volume, Pitch, LoadFile, PlaySound, IsStoppedOrNull, StopAll,
@@ -1791,13 +1984,14 @@ local wrapAudio = function(_aud, customTable)
         -- Yes
         
         -- Can only be Get:
-        if not isCYF and ((Encounter and not Encounter["isCYF"]) or not Encounter) then
+        if not isCYF then
             aud.playtime  = {fet = function() return _aud.playtime  end}
-            aud.totaltime = {fet = function() return _aud.totaltime end}
         end
+        aud.totaltime = {fet = function() return _aud.totaltime end}
         
         -- Can be Get and Set:
-        if (Encounter and Encounter["isCYF"]) or isCYF then
+        if isCYF then
+            aud.instance         = {get = function() return _aud.instance         end, set = function(val) _aud.instance = val         end}
             aud.src              = {get = function() return _aud.src              end, set = function(val) _aud.src = val              end}
             aud.hiddenDictionary = {get = function() return _aud.hiddenDictionary end, set = function(val) _aud.hiddenDictionary = val end}
             aud.filename         = {get = function() return _aud.filename         end, set = function(val) _aud.filename = val         end}
@@ -1805,7 +1999,7 @@ local wrapAudio = function(_aud, customTable)
         end
         
         -- Functions:
-        if (Encounter and Encounter["isCYF"]) or isCYF then
+        if isCYF then
             aud.IsStoppedOrNull    = {set = function(...) return _aud.IsStoppedOrNull(...)    end}
             aud.StopAll            = {set = function(...) return _aud.StopAll(...)            end}
             aud.PauseAll           = {set = function(...) return _aud.PauseAll(...)           end}
@@ -1844,7 +2038,7 @@ local wrapAudio = function(_aud, customTable)
     do
         local returnTab = {}
         
-        -- make every "property" of this table act like setting and getting the real property from the real projectile
+        -- make every "property" of this table act like setting and getting the real property from the real audio object
         for k, v in pairs(aud) do
             setmetatable(v, {
                     __call = function(tab, ...)
@@ -1871,7 +2065,7 @@ local wrapAudio = function(_aud, customTable)
         setmetatable(returnTab, {
                 __index = function(_, index)
                     -- allow for `audio["variable"]`
-                    if (Encounter and Encounter["isCYF"] or isCYF) and not aud[index] then
+                    if isCYF and not aud[index] then
                         return _aud.GetSoundDictionary(index)
                     elseif aud[index] then
                         if aud[index].get then
@@ -1889,7 +2083,7 @@ local wrapAudio = function(_aud, customTable)
                 end,
                 __newindex = function(_, key, value)
                     -- allow for `audio["variable"] = value`
-                    if (Encounter and Encounter["isCYF"] or isCYF) and not aud[key] then
+                    if isCYF and not aud[key] then
                         _aud.SetSoundDictionary(key, value)
                     else
                         if aud[key].set then
@@ -1935,11 +2129,12 @@ end
 
 -- this is an internal function! you can't call it yourself, or bad things would happen.
 local wrapNewAudio = function(_new, customTable)
-    local new = {}
-    
-    if not isCYF and ((Encounter and not Encounter["isCYF"]) or not Encounter) then
+    if not isCYF then
         error("The NewAudio object is exclusive to CYF.", 2)
     end
+    
+    local new = {}
+    customTable = customTable and customTable or {}
     
     --------------------------------------
     ---- DEFAULT VALUES AND FUNCTIONS ----
@@ -2011,7 +2206,7 @@ local wrapNewAudio = function(_new, customTable)
     do
         local returnTab = {}
         
-        -- make every "property" of this table act like setting and getting the real property from the real projectile
+        -- make every "property" of this table act like setting and getting the real property from the real newaudio object
         for k, v in pairs(new) do
             setmetatable(v, {
                     __call = function(tab, ...)
@@ -2097,6 +2292,7 @@ end
 -- this is an internal function! you can't call it yourself, or bad things would happen.
 local wrapInput = function(_inp, customTable)
     local inp = {}
+    customTable = customTable and customTable or {}
     
     --------------------------------------
     ---- DEFAULT VALUES AND FUNCTIONS ----
@@ -2136,7 +2332,7 @@ local wrapInput = function(_inp, customTable)
         -- Can only be Get:
         local onlyGet = {"Confirm", "Cancel", "Menu", "Up", "Down", "Left", "Right"}
         
-        if (Encounter and Encounter["isCYF"]) or isCYF then
+        if isCYF then
             local add = {"MousePosX", "MousePosY", "isMouseInWindow", "IsMouseInWindow"}
             
             for _, v in pairs(add) do
@@ -2148,7 +2344,7 @@ local wrapInput = function(_inp, customTable)
         -- (none)
         
         -- Functions:
-        if (Encounter and Encounter["isCYF"]) or isCYF then
+        if isCYF then
             inp.GetKey = {set = function(...) return inp.GetKey(...) end}
         end
     end
@@ -2174,7 +2370,7 @@ local wrapInput = function(_inp, customTable)
     do
         local returnTab = {}
         
-        -- make every "property" of this table act like setting and getting the real property from the real projectile
+        -- make every "property" of this table act like setting and getting the real property from the real input object
         for k, v in pairs(inp) do
             setmetatable(v, {
                     __call = function(tab, ...)
@@ -2260,6 +2456,7 @@ end
 -- this is an internal function! you can't call it yourself, or bad things would happen.
 local wrapTime = function(_tim, customTable)
     local tim = {}
+    customTable = customTable and customTable or {}
     
     --------------------------------------
     ---- DEFAULT VALUES AND FUNCTIONS ----
@@ -2299,7 +2496,7 @@ local wrapTime = function(_tim, customTable)
         -- Can only be Get:
         local onlyGet = {"time", "dt", "mult"}
         
-        if (Encounter and Encounter["isCYF"]) or isCYF then
+        if isCYF then
             table.insert(onlyGet, "wave")
         end
         
@@ -2335,7 +2532,7 @@ local wrapTime = function(_tim, customTable)
     do
         local returnTab = {}
         
-        -- make every "property" of this table act like setting and getting the real property from the real projectile
+        -- make every "property" of this table act like setting and getting the real property from the real time object
         for k, v in pairs(tim) do
             setmetatable(v, {
                     __call = function(tab, ...)
@@ -2420,11 +2617,12 @@ end
 
 -- this is an internal function! you can't call it yourself, or bad things would happen.
 local wrapMisc = function(_mis, customTable)
-    local mis = {}
-    
-    if not isCYF and ((Encounter and not Encounter["isCYF"]) or not Encounter) then
+    if not isCYF then
         error("The Misc object is exclusive to CYF.", 2)
     end
+    
+    local mis = {}
+    customTable = customTable and customTable or {}
     
     --------------------------------------
     ---- DEFAULT VALUES AND FUNCTIONS ----
@@ -2440,20 +2638,21 @@ local wrapMisc = function(_mis, customTable)
         -- CYF:
         --
         -- Can only be Get:
-        -- MachineName, ScreenHeight, ScreenWidth, WindowWidth, WindowHeight
+        -- MachineName, ScreenHeight, ScreenWidth, OSType, WindowWidth, WindowHeight
         -- 
         -- Can be Get and Set:
         -- FullScreen, cameraX, cameraY, window, WindowName, WindowX, WindowY
         -- 
         -- Functions:
-        -- ShakeScreen, StopShake, MoveCamera, MoveCameraTo, ResetCamera, RetargetWindow, FindWindow,
-        -- MoveWindow, GetWindowText, SetWindowText, GetWindowRect, MoveWindow, MoveWindowTo
+        -- ShakeScreen, StopShake, MoveCamera, MoveCameraTo, ResetCamera, DestroyWindow, OpenFile,
+        -- FileExists, ListDir, RetargetWindow, FindWindow, MoveWindow, GetWindowText, SetWindowText,
+        -- GetWindowRect, MoveWindow, MoveWindowTo
         --
         -- Object[variable] enabled?
         -- No
         
         -- Can only be Get:
-        local onlyGet = {"MachineName", "ScreenHeight", "ScreenWidth", "WindowWidth", "WindowHeight"}
+        local onlyGet = {"MachineName", "ScreenHeight", "ScreenWidth", "OSType", "WindowWidth", "WindowHeight"}
         
         for _, name in pairs(onlyGet) do
             mis[name] = {get = function() return _mis[name] end}
@@ -2468,8 +2667,8 @@ local wrapMisc = function(_mis, customTable)
         
         -- Functions:
         local functions = {"ShakeScreen", "StopShake", "MoveCamera", "MoveCameraTo", "ResetCamera",
-            "RetargetWindow", "FindWindow", "MoveWindow", "GetWindowText", "SetWindowText", "GetWindowRect",
-            "MoveWindow", "MoveWindowTo"}
+            "DestroyWindow", "OpenFile", "FileExists", "ListDir", "RetargetWindow", "FindWindow", "MoveWindow",
+            "GetWindowText", "SetWindowText", "GetWindowRect", "MoveWindow", "MoveWindowTo"}
         
         for _, name in pairs(functions) do
             mis[name] = {set = function(...) return _mis[name](...) end}
@@ -2481,6 +2680,14 @@ local wrapMisc = function(_mis, customTable)
     -------------------------------------
     
     do
+        if self.autoWrapFile then
+            mis.OpenFile = {set = function(...)
+                local _fil = _mis.OpenFile(...)
+                
+                return self.WrapFile(_fil)
+            end}
+        end
+        
         for index, newvalue in pairs(customTable) do
             mis[index] = newvalue
         end
@@ -2497,7 +2704,7 @@ local wrapMisc = function(_mis, customTable)
     do
         local returnTab = {}
         
-        -- make every "property" of this table act like setting and getting the real property from the real projectile
+        -- make every "property" of this table act like setting and getting the real property from the real misc object
         for k, v in pairs(mis) do
             setmetatable(v, {
                     __call = function(tab, ...)
@@ -2582,11 +2789,12 @@ end
 
 -- this is an internal function! you can't call it yourself, or bad things would happen.
 local wrapArena = function(_are, customTable)
-    local are = {}
-    
     if not Encounter or not Arena then
         error("NOT THE WAVE SCRIPT\n\nsorry but pls don't", 2)
     end
+    
+    local are = {}
+    customTable = customTable and customTable or {}
     
     --------------------------------------
     ---- DEFAULT VALUES AND FUNCTIONS ----
@@ -2627,7 +2835,7 @@ local wrapArena = function(_are, customTable)
         -- Can only be Get:
         local onlyGet = {"width", "height", "currentwidth", "currentheight"}
         
-        if (Encounter and Encounter["isCYF"]) or isCYF then
+        if isCYF then
             local add = {"x", "y", "currentx", "currenty", "isResizing", "isresizing", "isMoving",
                 "ismoving", "isModifying", "ismodifying"}
             
@@ -2646,7 +2854,7 @@ local wrapArena = function(_are, customTable)
         -- Functions:
         local functions = {"Resize", "ResizeImmediate"}
         
-        if (Encounter and Encounter["isCYF"]) or isCYF then
+        if isCYF then
             local add = {"Hide", "Show", "Move", "MoveTo", "MoveAndResize", "MoveToAndResize"}
             
             for _, name in pairs(add) do
@@ -2680,7 +2888,7 @@ local wrapArena = function(_are, customTable)
     do
         local returnTab = {}
         
-        -- make every "property" of this table act like setting and getting the real property from the real projectile
+        -- make every "property" of this table act like setting and getting the real property from the real arena object
         for k, v in pairs(are) do
             setmetatable(v, {
                     __call = function(tab, ...)
@@ -2765,11 +2973,12 @@ end
 
 -- this is an internal function! you can't call it yourself, or bad things would happen.
 local wrapInventory = function(_inv, customTable)
-    local inv = {}
-    
-    if not isCYF and ((Encounter and not Encounter["isCYF"]) or not Encounter) then
+    if not isCYF then
         error("The Inventory object is exclusive to CYF.", 2)
     end
+    
+    local inv = {}
+    customTable = customTable and customTable or {}
     
     --------------------------------------
     ---- DEFAULT VALUES AND FUNCTIONS ----
@@ -2832,7 +3041,7 @@ local wrapInventory = function(_inv, customTable)
     do
         local returnTab = {}
         
-        -- make every "property" of this table act like setting and getting the real property from the real projectile
+        -- make every "property" of this table act like setting and getting the real property from the real inventory object
         for k, v in pairs(inv) do
             setmetatable(v, {
                     __call = function(tab, ...)

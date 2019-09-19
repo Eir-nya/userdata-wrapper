@@ -273,8 +273,8 @@ Now, for the full list of variables and functions for this library:
 * `wrapper.autoWrapSprite`:
   
   = boolean = `true`
-  - Set this to true to automatically wrap `projectile.sprite` for wrapped projectiles, and `Player.sprite` for the wrapped Player.
-  - If this is true, then the values in `wrapper.spriteValues` will be applied to the sprite components of wrapped projectiles and the player.
+  - Set this to `true` to automatically wrap `projectile.sprite` for wrapped projectiles, and `Player.sprite` for the wrapped Player.
+  - If this is `true`, then the values in `wrapper.spriteValues` will be applied to the sprite components of wrapped projectiles and the player.
 
 * `wrapper.autoUnwrapUserdata`:
   
@@ -283,16 +283,23 @@ Now, for the full list of variables and functions for this library:
     automatically unwrap any table values you enter into them.
     
   - As an example: `sprite.SetParent` takes a sprite object as its only argument. With `autoUnwrapUserdata` as true,
-    all you have to do is pass a wrapped userdata OR a regular userdata. With this variable set to false, you would
+    all you have to do is pass a wrapped userdata OR a regular userdata. With this variable set to `false`, you would
     always have to pass a regular userdata value.
+
+* `wrapper.autoWrapFile`:
+  
+  = boolean = `true`
+  - Set this to `true`, and whenever you use `Misc.OpenFile` from the wrapped Misc object, it will, *by default*, return a wrapped File object.
+    I say "by default" because if you provide your own custom `OpenFile` function, it will be used instead (nothing unique to this variable).
+  - If this is `true`, then the values in `wrapper.fileValues` will be applied to any File objects created from the wrapped Misc object.
 
 * `wrapper.disguise`
   
   = boolean = `false`
-  - Set this to true to effectively "disguise" wrapped objects as real userdata values.
+  - Set this to `true` to effectively "disguise" wrapped objects as real userdata values.
     What this means is: Error messages will be printed for trying to get non-existant properties, trying to convert the userdata to a string, using it in a for loop, and so on.
     
-  - This is actually useful for functions such as CYK's `table.copy` function, because if the Player were wrapped, it would duplicate the metatable and cause problems. With `disguise` as true, such a function would be forced to believe that the wrapped userdata is a REAL userdata value.
+  - This is actually useful for functions such as CYK's `table.copy` function, because if the Player were wrapped, it would duplicate the metatable and cause problems. With `disguise` as `true`, such a function would be forced to believe that the wrapped userdata is a REAL userdata value.
 
 * `wrapper.spriteValues`,
 * `wrapper.projectileValues`,
