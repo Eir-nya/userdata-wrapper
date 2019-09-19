@@ -304,7 +304,8 @@ Now, for the full list of variables and functions for this library:
 * `wrapper.spriteValues`,
 * `wrapper.projectileValues`,
 * `wrapper.scriptValues`,
-* `wrapper.textValues`
+* `wrapper.textValues`,
+* `wrapper.fileValues`,
   
   = override table (see section **Override Tables**) = `{}`
   - Set this to an override table, and the values you set here will be applied to ALL wrapped sprites/projectiles/etc by default.
@@ -320,7 +321,8 @@ Now, for the full list of variables and functions for this library:
 * `wrapper.WrapSprite(sprite, overrideTable = nil)`,
 * `wrapper.WrapProjectile(projectile, overrideTable = nil)`,
 * `wrapper.WrapScript(script, overrideTable = nil)`,
-* `wrapper.WrapText(text, overrideTable = nil)`
+* `wrapper.WrapText(text, overrideTable = nil)`,
+* `wrapper.WrapFile(file, overrideTable = nil)`,
   
   = takes 1 "multi-instance" userdata from Unitale/CYF, and one OPTIONAL override table (see section **Override Tables**)
   - Returns a single table with metatables that "wraps" a given Unitale/CYF userdata object.
